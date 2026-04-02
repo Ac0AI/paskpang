@@ -285,6 +285,44 @@ let animId;
 let rallyCount = 0;
 let comboText = '';
 let comboTimer = 0;
+let quoteText = '';
+let quoteName = '';
+
+// Citat fran ganget
+const QUOTES = [
+  { name: 'Ninis-kanansen', quote: 'Den kartongen var tyngre an min skuld!' },
+  { name: 'Ninis-kanansen', quote: 'Jag bar inte kartonger, jag bar drommen!' },
+  { name: 'HiphopNansen', quote: 'Den returen var renare an min mixtape!' },
+  { name: 'HiphopNansen', quote: 'Flowar hardare an den dar kartongen!' },
+  { name: 'Joelx2', quote: 'Dubbelt sa bra, dubbelt sa snabbt!' },
+  { name: 'Joelx2', quote: 'Tva Joel ar battre an en kartong!' },
+  { name: 'Freddefulansen', quote: 'Den studsen var fulare an mitt smeknamn!' },
+  { name: 'Freddefulansen', quote: 'Ful men effektiv, precis som jag!' },
+  { name: 'Cageman', quote: 'Satt i buren for lange, nu ar jag fri!' },
+  { name: 'Cageman', quote: 'Ingen bur kan halla den kartongen!' },
+  { name: 'Matadansen', quote: 'Ole! Den kartongen kunde inte stoppa mig!' },
+  { name: 'Matadansen', quote: 'Jag svangde undan som en riktig matador!' },
+  { name: 'Zissi', quote: 'Zzzapp! Sa fort gick den!' },
+  { name: 'Zissi', quote: 'Ingen kan stoppa Zissi-expressen!' },
+  { name: 'Abud', quote: 'Wallah den dar returen var magnifik!' },
+  { name: 'Abud', quote: 'Habibi, vilken rally!' },
+  { name: 'Fansen', quote: 'Den dar smallen kandes i hela kroppen!' },
+  { name: 'Fansen', quote: 'Kartongen flyr snabbare an jag fran ansvar!' },
+  { name: 'Kjansen', quote: 'Lugn och metodisk, sa vinner man!' },
+  { name: 'Kjansen', quote: 'Det dar var precisionsflytt!' },
+  { name: 'Mr Finance', quote: 'Den returen hade hog ROI!' },
+  { name: 'Mr Finance', quote: 'Investerade i den smallen, fick bra avkastning!' },
+  { name: 'SebbeCeo', quote: 'Delegera kartongen, jag leder matchen!' },
+  { name: 'SebbeCeo', quote: 'CEO-move, den dar returen!' },
+  { name: 'Glammy', quote: 'Den returen var lika snygg som jag!' },
+  { name: 'Glammy', quote: 'Glamorost mal, glamoros retur!' },
+  { name: 'Mercan', quote: 'Den studsen var hardare an mina beats!' },
+  { name: 'Mercan', quote: 'Kartongen bouncar som min musik!' },
+  { name: 'Brottarludwig', quote: 'Jag brottade ner den kartongen!' },
+  { name: 'Brottarludwig', quote: 'Suplex pa den returen!' },
+  { name: 'Stajna', quote: 'Stansen ar starkare an nagonsin!' },
+  { name: 'Stajna', quote: 'Ingen stannar Stajna!' },
+];
 
 let player, ai, ball;
 let particles = [];
@@ -657,8 +695,13 @@ function update() {
     spawnHitParticles(ball.x, ball.y, C.teal, 10);
     sfxHit(1);
     screenShake.intensity = 3;
-    if (rallyCount >= 5) { comboText = 'Rally x' + rallyCount + '!'; comboTimer = 90; }
-    else if (rallyCount >= 3) { comboText = 'Bra retur!'; comboTimer = 60; }
+    if (rallyCount >= 3) {
+      comboText = rallyCount >= 5 ? 'Rally x' + rallyCount + '!' : 'Bra retur!';
+      comboTimer = rallyCount >= 5 ? 90 : 60;
+      const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+      quoteText = '"' + q.quote + '"';
+      quoteName = '- ' + q.name;
+    }
   }
 
   // AI paddle collision
@@ -825,17 +868,34 @@ function draw() {
   ctx.fillText('KYCKLINGARNA', W * 0.85, H - 12);
   ctx.letterSpacing = '0px';
 
-  // Combo text
+  // Combo text + quote
   if (comboTimer > 0) {
     const alpha = Math.min(1, comboTimer / 20);
     ctx.globalAlpha = alpha;
-    ctx.font = '800 20px Inter, system-ui';
     ctx.textAlign = 'center';
+
+    // Combo label
+    ctx.font = '800 20px Inter, system-ui';
     ctx.fillStyle = C.teal;
     ctx.shadowColor = C.teal;
     ctx.shadowBlur = 15;
-    ctx.fillText(comboText, W / 2, H / 2 - 40);
+    ctx.fillText(comboText, W / 2, H / 2 - 55);
     ctx.shadowBlur = 0;
+
+    // Quote
+    if (quoteText) {
+      ctx.font = '600 15px Inter, system-ui';
+      ctx.fillStyle = '#FFD700';
+      ctx.shadowColor = '#FFD700';
+      ctx.shadowBlur = 8;
+      ctx.fillText(quoteText, W / 2, H / 2 - 30);
+      ctx.shadowBlur = 0;
+
+      ctx.font = '700 12px Inter, system-ui';
+      ctx.fillStyle = '#b8a9d4';
+      ctx.fillText(quoteName, W / 2, H / 2 - 12);
+    }
+
     ctx.globalAlpha = 1;
   }
 
