@@ -270,9 +270,9 @@ const C = {
 
 // --- EASIER SETTINGS ---
 const WIN_SCORE = 5;
-const BALL_SPEED_INIT = 3.5;
-const BALL_SPEED_MAX = 8;
-const BALL_SPEED_INCREASE = 0.15;
+const BALL_SPEED_INIT = 5;
+const BALL_SPEED_MAX = 10;
+const BALL_SPEED_INCREASE = 0.2;
 const AI_BASE_SPEED = 2.8;
 const AI_REACTION_DELAY = 0.55; // lower = dumber
 const PADDLE_W = 16;
@@ -341,7 +341,7 @@ function resetBall(dir) {
   ball = {
     x: W / 2,
     y: H / 2,
-    r: 12,
+    r: 18,
     vx: Math.cos(angle) * BALL_SPEED_INIT * d,
     vy: Math.sin(angle) * BALL_SPEED_INIT,
     speed: BALL_SPEED_INIT,
@@ -428,56 +428,110 @@ function playNote(freq, duration, time, vol = 0.08, type = 'square') {
   osc.stop(time + duration);
 }
 
-// Glad pask-melodi (8-bit style)
-const MELODY_NOTES = [
-  // Frere Jacques-inspirerad glad melodi
-  392, 440, 494, 392,   // G A B G
-  392, 440, 494, 392,   // G A B G
-  494, 523, 587, 0,     // B C D -
-  494, 523, 587, 0,     // B C D -
-  587, 659, 587, 523, 494, 392, 0, 0,  // D E D C B G
-  587, 659, 587, 523, 494, 392, 0, 0,  // D E D C B G
-  392, 294, 392, 0,     // G D G -
-  392, 294, 392, 0,     // G D G -
+// Upbeat pask-polka chiptune
+// Each entry: [freq, duration_multiplier] (0 = rest)
+const MELODY = [
+  // Phrase 1 - bouncy intro
+  [659,1],[784,1],[880,1],[784,1],  // E5 G5 A5 G5
+  [659,2],[523,1],[587,1],          // E5-- C5 D5
+  [659,1],[784,1],[880,1],[1047,1], // E5 G5 A5 C6
+  [880,2],[784,1],[0,1],            // A5-- G5 -
+
+  // Phrase 2 - call and response
+  [1047,1],[988,1],[880,1],[784,1], // C6 B5 A5 G5
+  [659,2],[587,1],[659,1],          // E5-- D5 E5
+  [784,1],[659,1],[587,1],[523,1],  // G5 E5 D5 C5
+  [587,2],[659,1],[0,1],            // D5-- E5 -
+
+  // Phrase 3 - high energy
+  [880,1],[880,0.5],[784,0.5],[880,1],[1047,1], // A5 A5.G5.A5 C6
+  [1175,2],[1047,1],[880,1],        // D6-- C6 A5
+  [784,1],[784,0.5],[659,0.5],[784,1],[880,1],  // G5 G5.E5.G5 A5
+  [784,2],[659,1],[0,1],            // G5-- E5 -
+
+  // Phrase 4 - finale
+  [523,1],[659,1],[784,1],[880,1],  // C5 E5 G5 A5
+  [1047,1],[880,1],[784,2],         // C6 A5 G5--
+  [659,1],[784,1],[880,1],[784,1],  // E5 G5 A5 G5
+  [659,2],[0,1],[0,1],              // E5-- - -
 ];
 
-const BASS_NOTES = [
-  196, 196, 196, 196,
-  196, 196, 196, 196,
-  247, 262, 294, 294,
-  247, 262, 294, 294,
-  294, 330, 294, 262, 247, 196, 196, 196,
-  294, 330, 294, 262, 247, 196, 196, 196,
-  196, 147, 196, 196,
-  196, 147, 196, 196,
+const BASS = [
+  // Phrase 1
+  [262,2],[0,1],[262,1],  [196,2],[0,1],[196,1],
+  [262,2],[0,1],[262,1],  [220,2],[0,1],[220,1],
+  // Phrase 2
+  [262,2],[0,1],[262,1],  [196,2],[0,1],[196,1],
+  [220,2],[0,1],[220,1],  [196,2],[0,1],[196,1],
+  // Phrase 3
+  [220,2],[0,1],[220,1],  [294,2],[0,1],[294,1],
+  [196,2],[0,1],[196,1],  [262,2],[0,1],[262,1],
+  // Phrase 4
+  [262,2],[0,1],[262,1],  [220,2],[262,1],[196,1],
+  [262,2],[0,1],[262,1],  [196,2],[0,1],[0,1],
 ];
 
 function playMusic() {
   if (!audioCtx || !musicPlaying) return;
   const now = audioCtx.currentTime;
-  const tempo = 0.18; // seconds per note
+  const beat = 0.14; // seconds per beat - snappy
 
-  for (let i = 0; i < MELODY_NOTES.length; i++) {
-    const t = now + i * tempo;
-    if (MELODY_NOTES[i] > 0) {
-      playNote(MELODY_NOTES[i], tempo * 0.8, t, 0.06, 'square');
+  // Play melody
+  let t = now;
+  for (let i = 0; i < MELODY.length; i++) {
+    const [freq, dur] = MELODY[i];
+    const noteDur = beat * dur;
+    if (freq > 0) {
+      playNote(freq, noteDur * 0.85, t, 0.07, 'square');
+      // Add shimmer on high notes
+      if (freq >= 880) playNote(freq * 2, noteDur * 0.3, t, 0.015, 'sine');
     }
-    if (BASS_NOTES[i] > 0) {
-      playNote(BASS_NOTES[i], tempo * 0.9, t, 0.04, 'triangle');
+    t += noteDur;
+  }
+  const melodyLen = t - now;
+
+  // Play bass
+  t = now;
+  for (let i = 0; i < BASS.length; i++) {
+    const [freq, dur] = BASS[i];
+    const noteDur = beat * dur;
+    if (freq > 0) {
+      playNote(freq, noteDur * 0.9, t, 0.05, 'triangle');
     }
-    // Drum-ish percussion on beats
+    t += noteDur;
+  }
+
+  // Drums - kick and hihat pattern
+  const totalBeats = Math.round(melodyLen / beat);
+  for (let i = 0; i < totalBeats; i++) {
+    const dt = now + i * beat;
     if (i % 4 === 0) {
-      playNote(80, 0.05, t, 0.05, 'square');
+      playNote(65, 0.08, dt, 0.07, 'sine');       // kick
     } else if (i % 4 === 2) {
-      playNote(200, 0.03, t, 0.03, 'sawtooth');
+      playNote(65, 0.06, dt, 0.04, 'sine');        // soft kick
+    }
+    if (i % 2 === 1) {
+      playNote(800, 0.02, dt, 0.02, 'sawtooth');   // hihat
+    }
+    // Snare-ish on 2 and 4
+    if (i % 8 === 3 || i % 8 === 7) {
+      playNote(180, 0.04, dt, 0.04, 'square');
+      playNote(350, 0.03, dt, 0.025, 'sawtooth');
     }
   }
 
+  // Arp accent every 8 beats
+  for (let i = 0; i < totalBeats; i += 8) {
+    const dt = now + i * beat;
+    playNote(1318, 0.03, dt, 0.02, 'square');
+    playNote(1568, 0.03, dt + 0.04, 0.015, 'square');
+    playNote(1760, 0.03, dt + 0.08, 0.01, 'square');
+  }
+
   // Loop
-  const loopTime = MELODY_NOTES.length * tempo * 1000;
   musicTimeout = setTimeout(() => {
     if (musicPlaying) playMusic();
-  }, loopTime - 50);
+  }, melodyLen * 1000 - 50);
 }
 
 function startMusic() {
@@ -840,15 +894,25 @@ function drawPaddle(p, color, emoji) {
 function drawBallBox() {
   const x = ball.x, y = ball.y, r = ball.r;
 
+  // Bright glow circle behind the box
+  const glowGrad = ctx.createRadialGradient(x, y, 0, x, y, r * 2);
+  glowGrad.addColorStop(0, 'rgba(255, 215, 0, 0.25)');
+  glowGrad.addColorStop(0.5, 'rgba(255, 215, 0, 0.08)');
+  glowGrad.addColorStop(1, 'rgba(255, 215, 0, 0)');
+  ctx.fillStyle = glowGrad;
+  ctx.beginPath();
+  ctx.arc(x, y, r * 2, 0, Math.PI * 2);
+  ctx.fill();
+
   // Glow
   ctx.shadowColor = '#FFD700';
-  ctx.shadowBlur = 20;
+  ctx.shadowBlur = 25;
 
-  // Draw box emoji
+  // Draw box emoji - bigger
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(ball.rotation * Math.PI / 180);
-  ctx.font = (r * 2.2) + 'px serif';
+  ctx.font = (r * 2.5) + 'px serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('📦', 0, 0);
