@@ -627,7 +627,8 @@ function update() {
     trails.push({ x: ball.x, y: ball.y, life: 1 });
   }
 
-  // Ball movement
+  // Ball movement - store previous position for sweep collision
+  const prevX = ball.x;
   ball.x += ball.vx;
   ball.y += ball.vy;
   ball.rotation += ball.speed * 2;
@@ -646,23 +647,25 @@ function update() {
     sfxBounce();
   }
 
-  // Player paddle collision (with tunneling protection)
-  if (ball.vx < 0 && ball.x - ball.r <= player.x + player.w && ball.x >= player.x - ball.r &&
-      ball.y >= player.y - 6 && ball.y <= player.y + player.h + 6 && lastHitSide !== 'player') {
+  // Player paddle collision (sweep test - checks if ball crossed paddle between frames)
+  const playerRight = player.x + player.w;
+  if (ball.vx < 0 && lastHitSide !== 'player' &&
+      ball.x - ball.r <= playerRight && prevX - ball.r >= player.x &&
+      ball.y >= player.y - 8 && ball.y <= player.y + player.h + 8) {
     lastHitSide = 'player';
     rallyCount++;
-    const hitPos = (ball.y - player.y) / player.h - 0.5;
+    const hitPos = Math.max(-0.5, Math.min(0.5, (ball.y - player.y) / player.h - 0.5));
     ball.speed = Math.min(ball.speed + BALL_SPEED_INCREASE, BALL_SPEED_MAX);
-    const angle = hitPos * 1.0; // less extreme angles
+    const angle = hitPos * 0.9;
     ball.vx = Math.cos(angle) * ball.speed;
     ball.vy = Math.sin(angle) * ball.speed;
-    ball.x = player.x + player.w + ball.r;
+    ball.x = playerRight + ball.r;
     spawnHitParticles(ball.x, ball.y, C.teal, 10);
     sfxHit(1);
     screenShake.intensity = 3;
     if (rallyCount >= 3) {
       comboText = rallyCount >= 5 ? 'Rally x' + rallyCount + '!' : 'Bra retur!';
-      comboTimer = rallyCount >= 5 ? 120 : 90;
+      comboTimer = rallyCount >= 5 ? 138 : 108;
       let qi = Math.floor(Math.random() * QUOTES.length);
       if (qi === lastQuoteIndex) qi = (qi + 1 + Math.floor(Math.random() * (QUOTES.length - 1))) % QUOTES.length;
       lastQuoteIndex = qi;
@@ -672,17 +675,19 @@ function update() {
     }
   }
 
-  // AI paddle collision (with tunneling protection)
-  if (ball.vx > 0 && ball.x + ball.r >= ai.x && ball.x <= ai.x + ai.w + ball.r &&
-      ball.y >= ai.y - 6 && ball.y <= ai.y + ai.h + 6 && lastHitSide !== 'ai') {
+  // AI paddle collision (sweep test)
+  const aiLeft = ai.x;
+  if (ball.vx > 0 && lastHitSide !== 'ai' &&
+      ball.x + ball.r >= aiLeft && prevX + ball.r <= ai.x + ai.w &&
+      ball.y >= ai.y - 8 && ball.y <= ai.y + ai.h + 8) {
     lastHitSide = 'ai';
     rallyCount++;
-    const hitPos = (ball.y - ai.y) / ai.h - 0.5;
+    const hitPos = Math.max(-0.5, Math.min(0.5, (ball.y - ai.y) / ai.h - 0.5));
     ball.speed = Math.min(ball.speed + BALL_SPEED_INCREASE, BALL_SPEED_MAX);
-    const angle = Math.PI - hitPos * 1.0;
+    const angle = Math.PI - hitPos * 0.9;
     ball.vx = Math.cos(angle) * ball.speed;
     ball.vy = Math.sin(angle) * ball.speed;
-    ball.x = ai.x - ball.r;
+    ball.x = aiLeft - ball.r;
     spawnHitParticles(ball.x, ball.y, C.orange, 10);
     sfxHit(1.2);
     screenShake.intensity = 3;
