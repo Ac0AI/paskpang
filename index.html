@@ -290,38 +290,102 @@ let quoteName = '';
 
 // Citat fran ganget
 const QUOTES = [
+  // Ninis-kanansen
   { name: 'Ninis-kanansen', quote: 'Den kartongen var tyngre an min skuld!' },
   { name: 'Ninis-kanansen', quote: 'Jag bar inte kartonger, jag bar drommen!' },
+  { name: 'Ninis-kanansen', quote: 'Kanansen slapper aldrig taget!' },
+  { name: 'Ninis-kanansen', quote: 'Hoppade hogre an kartongen dar!' },
+  { name: 'Ninis-kanansen', quote: 'Nansen har landat, och den landade HART!' },
+  // HiphopNansen
   { name: 'HiphopNansen', quote: 'Den returen var renare an min mixtape!' },
   { name: 'HiphopNansen', quote: 'Flowar hardare an den dar kartongen!' },
+  { name: 'HiphopNansen', quote: 'Bars pa bars pa returer!' },
+  { name: 'HiphopNansen', quote: 'Den beaten droppade hardare an bollen!' },
+  { name: 'HiphopNansen', quote: 'Spotta fire pa den returen yo!' },
+  // Joelx2
   { name: 'Joelx2', quote: 'Dubbelt sa bra, dubbelt sa snabbt!' },
   { name: 'Joelx2', quote: 'Tva Joel ar battre an en kartong!' },
+  { name: 'Joelx2', quote: 'x2 damage pa den smallen!' },
+  { name: 'Joelx2', quote: 'Combo? Jag AR en combo!' },
+  { name: 'Joelx2', quote: 'Dubbel-Joel dubbel-trouble!' },
+  // Freddefulansen
   { name: 'Freddefulansen', quote: 'Den studsen var fulare an mitt smeknamn!' },
   { name: 'Freddefulansen', quote: 'Ful men effektiv, precis som jag!' },
+  { name: 'Freddefulansen', quote: 'Fansen ar ful, men returen var snygg!' },
+  { name: 'Freddefulansen', quote: 'Fult spel? Nej, smart spel!' },
+  { name: 'Freddefulansen', quote: 'Jag gor fult till en konstform!' },
+  // Cageman
   { name: 'Cageman', quote: 'Satt i buren for lange, nu ar jag fri!' },
   { name: 'Cageman', quote: 'Ingen bur kan halla den kartongen!' },
+  { name: 'Cageman', quote: 'Cagen ar oppen och jag ar ute!' },
+  { name: 'Cageman', quote: 'Inlaast potential, frislppt resultat!' },
+  { name: 'Cageman', quote: 'Buren ar tom, planen ar full!' },
+  // Matadansen
   { name: 'Matadansen', quote: 'Ole! Den kartongen kunde inte stoppa mig!' },
   { name: 'Matadansen', quote: 'Jag svangde undan som en riktig matador!' },
+  { name: 'Matadansen', quote: 'Toro! Kartongen rushade men jag stod kvar!' },
+  { name: 'Matadansen', quote: 'Dansar runt den dar bollen!' },
+  { name: 'Matadansen', quote: 'Ole ole ole, vilken rally!' },
+  // Zissi
   { name: 'Zissi', quote: 'Zzzapp! Sa fort gick den!' },
   { name: 'Zissi', quote: 'Ingen kan stoppa Zissi-expressen!' },
+  { name: 'Zissi', quote: 'Snabbare an ljuset, nastan!' },
+  { name: 'Zissi', quote: 'Zissi ser allt, Zissi vet allt!' },
+  { name: 'Zissi', quote: 'Den dar bollen hade noll chans!' },
+  // Abud
   { name: 'Abud', quote: 'Wallah den dar returen var magnifik!' },
   { name: 'Abud', quote: 'Habibi, vilken rally!' },
+  { name: 'Abud', quote: 'Yalla yalla, fortare kartong!' },
+  { name: 'Abud', quote: 'Mashallah vilken smash!' },
+  { name: 'Abud', quote: 'Den dar returen var halal!' },
+  // Fansen
   { name: 'Fansen', quote: 'Den dar smallen kandes i hela kroppen!' },
   { name: 'Fansen', quote: 'Kartongen flyr snabbare an jag fran ansvar!' },
+  { name: 'Fansen', quote: 'Alltid pa plats nar det smaller!' },
+  { name: 'Fansen', quote: 'Filansen levererar, som vanligt!' },
+  { name: 'Fansen', quote: 'Den dar kartongen visste inte vad som traffade den!' },
+  // Kjansen
   { name: 'Kjansen', quote: 'Lugn och metodisk, sa vinner man!' },
   { name: 'Kjansen', quote: 'Det dar var precisionsflytt!' },
+  { name: 'Kjansen', quote: 'Kansen har en plan, och den funkar!' },
+  { name: 'Kjansen', quote: 'Beraknad vinkel, perfekt retur!' },
+  { name: 'Kjansen', quote: 'Systematiskt overlagset, som alltid!' },
+  // Mr Finance
   { name: 'Mr Finance', quote: 'Den returen hade hog ROI!' },
   { name: 'Mr Finance', quote: 'Investerade i den smallen, fick bra avkastning!' },
+  { name: 'Mr Finance', quote: 'Bull market pa returer just nu!' },
+  { name: 'Mr Finance', quote: 'Portfolio: 100% pong-gains!' },
+  { name: 'Mr Finance', quote: 'Den dar rallyen var en blue chip!' },
+  // SebbeCeo
   { name: 'SebbeCeo', quote: 'Delegera kartongen, jag leder matchen!' },
   { name: 'SebbeCeo', quote: 'CEO-move, den dar returen!' },
+  { name: 'SebbeCeo', quote: 'Strategiskt beslut, taktisk retur!' },
+  { name: 'SebbeCeo', quote: 'Skalbar modell, den har rallyen!' },
+  { name: 'SebbeCeo', quote: 'Board meeting ajournerad for pong!' },
+  // Glammy
   { name: 'Glammy', quote: 'Den returen var lika snygg som jag!' },
   { name: 'Glammy', quote: 'Glamorost mal, glamoros retur!' },
+  { name: 'Glammy', quote: 'Sparkle pa den dar smallen!' },
+  { name: 'Glammy', quote: 'Snyggaste returen i hela turneringen!' },
+  { name: 'Glammy', quote: 'Kartongen glittrar i mitt sken!' },
+  // Mercan
   { name: 'Mercan', quote: 'Den studsen var hardare an mina beats!' },
   { name: 'Mercan', quote: 'Kartongen bouncar som min musik!' },
+  { name: 'Mercan', quote: 'Drop the bass, drop the kartong!' },
+  { name: 'Mercan', quote: 'Den dar returen hade bra rytm!' },
+  { name: 'Mercan', quote: 'Remix pa den rallyen, tack!' },
+  // Brottarludwig
   { name: 'Brottarludwig', quote: 'Jag brottade ner den kartongen!' },
   { name: 'Brottarludwig', quote: 'Suplex pa den returen!' },
+  { name: 'Brottarludwig', quote: 'Bodyslam! Kartongen ar nere!' },
+  { name: 'Brottarludwig', quote: 'Ingen matchar Ludwig i ringen!' },
+  { name: 'Brottarludwig', quote: 'Armbrytning med kartongen, och jag vann!' },
+  // Stajna
   { name: 'Stajna', quote: 'Stansen ar starkare an nagonsin!' },
   { name: 'Stajna', quote: 'Ingen stannar Stajna!' },
+  { name: 'Stajna', quote: 'Stajna-style, accept no substitute!' },
+  { name: 'Stajna', quote: 'Den dar returen hade stansen signatur!' },
+  { name: 'Stajna', quote: 'Sten, stal, Stajna!' },
 ];
 
 let player, ai, ball;
@@ -736,7 +800,7 @@ function update() {
     screenShake.intensity = 3;
     if (rallyCount >= 3) {
       comboText = rallyCount >= 5 ? 'Rally x' + rallyCount + '!' : 'Bra retur!';
-      comboTimer = rallyCount >= 5 ? 90 : 60;
+      comboTimer = rallyCount >= 5 ? 120 : 90;
       const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
       quoteText = '"' + q.quote + '"';
       quoteName = '- ' + q.name;
