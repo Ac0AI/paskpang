@@ -235,8 +235,8 @@
         <span class="team-name">Kycklingarna</span>
       </div>
     </div>
-    <button class="btn btn-primary" onclick="startGame()">🥚 Kor igang!</button>
-    <div class="controls-hint">⬆️⬇️ Piltangenter</div>
+    <button class="btn btn-primary" onclick="startGame()">🥚 Kör igång!</button>
+    <div class="controls-hint">⬆️⬇️ Piltangenter · Enter för att starta</div>
   </div>
 
   <div id="game-over-screen">
@@ -251,15 +251,15 @@
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 
-// Påsk-tema farger
+// Påsk-tema färger
 const C = {
   bg: '#1a0f2e',
   gridLine: 'rgba(255, 215, 0, 0.06)',
   centerLine: 'rgba(255, 215, 0, 0.15)',
-  teal: '#FF6B35',       // Flyttgubbarna (vanster)
+  teal: '#FF6B35',       // Flyttgubbarna (vänster)
   tealGlow: 'rgba(255, 107, 53, 0.3)',
   tealDark: '#cc4400',
-  orange: '#FFD700',      // Kycklingarna (hoger)
+  orange: '#FFD700',      // Kycklingarna (höger)
   orangeGlow: 'rgba(255, 215, 0, 0.3)',
   white: '#faf9f6',
   bronze: '#b8a9d4',
@@ -288,104 +288,104 @@ let comboTimer = 0;
 let quoteText = '';
 let quoteName = '';
 
-// Citat fran ganget
+// Citat från gänget
 const QUOTES = [
   // Ninis-kanansen
-  { name: 'Ninis-kanansen', quote: 'Den kartongen var tyngre an min skuld!' },
-  { name: 'Ninis-kanansen', quote: 'Jag bar inte kartonger, jag bar drommen!' },
-  { name: 'Ninis-kanansen', quote: 'Kanansen slapper aldrig taget!' },
-  { name: 'Ninis-kanansen', quote: 'Hoppade hogre an kartongen dar!' },
-  { name: 'Ninis-kanansen', quote: 'Nansen har landat, och den landade HART!' },
-  // HiphopNansen
-  { name: 'HiphopNansen', quote: 'Den returen var renare an min mixtape!' },
-  { name: 'HiphopNansen', quote: 'Flowar hardare an den dar kartongen!' },
-  { name: 'HiphopNansen', quote: 'Bars pa bars pa returer!' },
-  { name: 'HiphopNansen', quote: 'Den beaten droppade hardare an bollen!' },
-  { name: 'HiphopNansen', quote: 'Spotta fire pa den returen yo!' },
+  { name: 'Ninis-kanansen', quote: 'Den kartongen var tyngre än min skuld!' },
+  { name: 'Ninis-kanansen', quote: 'Jag bär inte kartonger, jag bär drömmen!' },
+  { name: 'Ninis-kanansen', quote: 'Kanansen släpper aldrig taget!' },
+  { name: 'Ninis-kanansen', quote: 'Hoppade högre än kartongen där!' },
+  { name: 'Ninis-kanansen', quote: 'Nansen har landat, och den landade HÅRT!' },
+  // HiphopNils
+  { name: 'HiphopNils', quote: 'Den returen var renare än min mixtape!' },
+  { name: 'HiphopNils', quote: 'Flowar hårdare än den där kartongen!' },
+  { name: 'HiphopNils', quote: 'Bars på bars på returer!' },
+  { name: 'HiphopNils', quote: 'Den beaten droppade hårdare än bollen!' },
+  { name: 'HiphopNils', quote: 'Spotta fire på den returen yo!' },
   // Joelx2
-  { name: 'Joelx2', quote: 'Dubbelt sa bra, dubbelt sa snabbt!' },
-  { name: 'Joelx2', quote: 'Tva Joel ar battre an en kartong!' },
-  { name: 'Joelx2', quote: 'x2 damage pa den smallen!' },
-  { name: 'Joelx2', quote: 'Combo? Jag AR en combo!' },
+  { name: 'Joelx2', quote: 'Dubbelt så bra, dubbelt så snabbt!' },
+  { name: 'Joelx2', quote: 'Två Joel är bättre än en kartong!' },
+  { name: 'Joelx2', quote: 'x2 damage på den smällen!' },
+  { name: 'Joelx2', quote: 'Combo? Jag ÄR en combo!' },
   { name: 'Joelx2', quote: 'Dubbel-Joel dubbel-trouble!' },
   // Freddefulansen
-  { name: 'Freddefulansen', quote: 'Den studsen var fulare an mitt smeknamn!' },
+  { name: 'Freddefulansen', quote: 'Den studsen var fulare än mitt smeknamn!' },
   { name: 'Freddefulansen', quote: 'Ful men effektiv, precis som jag!' },
-  { name: 'Freddefulansen', quote: 'Fansen ar ful, men returen var snygg!' },
+  { name: 'Freddefulansen', quote: 'Fulansen är ful, men returen var snygg!' },
   { name: 'Freddefulansen', quote: 'Fult spel? Nej, smart spel!' },
-  { name: 'Freddefulansen', quote: 'Jag gor fult till en konstform!' },
+  { name: 'Freddefulansen', quote: 'Jag gör fult till en konstform!' },
   // Cageman
-  { name: 'Cageman', quote: 'Satt i buren for lange, nu ar jag fri!' },
-  { name: 'Cageman', quote: 'Ingen bur kan halla den kartongen!' },
-  { name: 'Cageman', quote: 'Cagen ar oppen och jag ar ute!' },
-  { name: 'Cageman', quote: 'Inlaast potential, frislppt resultat!' },
-  { name: 'Cageman', quote: 'Buren ar tom, planen ar full!' },
-  // Matadansen
-  { name: 'Matadansen', quote: 'Ole! Den kartongen kunde inte stoppa mig!' },
-  { name: 'Matadansen', quote: 'Jag svangde undan som en riktig matador!' },
-  { name: 'Matadansen', quote: 'Toro! Kartongen rushade men jag stod kvar!' },
-  { name: 'Matadansen', quote: 'Dansar runt den dar bollen!' },
-  { name: 'Matadansen', quote: 'Ole ole ole, vilken rally!' },
+  { name: 'Cageman', quote: 'Satt i buren för länge, nu är jag fri!' },
+  { name: 'Cageman', quote: 'Ingen bur kan hålla den kartongen!' },
+  { name: 'Cageman', quote: 'Cagen är öppen och jag är ute!' },
+  { name: 'Cageman', quote: 'Inlåst potential, frisläppt resultat!' },
+  { name: 'Cageman', quote: 'Buren är tom, planen är full!' },
+  // Matadoren
+  { name: 'Matadoren', quote: 'Olé! Den kartongen kunde inte stoppa mig!' },
+  { name: 'Matadoren', quote: 'Jag svängde undan som en riktig matador!' },
+  { name: 'Matadoren', quote: 'Toro! Kartongen rushade men jag stod kvar!' },
+  { name: 'Matadoren', quote: 'Dansar runt den där bollen!' },
+  { name: 'Matadoren', quote: 'Olé olé olé, vilken rally!' },
   // Zissi
-  { name: 'Zissi', quote: 'Zzzapp! Sa fort gick den!' },
+  { name: 'Zissi', quote: 'Zzzapp! Så fort gick den!' },
   { name: 'Zissi', quote: 'Ingen kan stoppa Zissi-expressen!' },
-  { name: 'Zissi', quote: 'Snabbare an ljuset, nastan!' },
+  { name: 'Zissi', quote: 'Snabbare än ljuset, nästan!' },
   { name: 'Zissi', quote: 'Zissi ser allt, Zissi vet allt!' },
-  { name: 'Zissi', quote: 'Den dar bollen hade noll chans!' },
+  { name: 'Zissi', quote: 'Den där bollen hade noll chans!' },
   // Abud
-  { name: 'Abud', quote: 'Wallah den dar returen var magnifik!' },
-  { name: 'Abud', quote: 'Habibi, vilken rally!' },
-  { name: 'Abud', quote: 'Yalla yalla, fortare kartong!' },
-  { name: 'Abud', quote: 'Mashallah vilken smash!' },
-  { name: 'Abud', quote: 'Den dar returen var halal!' },
-  // Fansen
-  { name: 'Fansen', quote: 'Den dar smallen kandes i hela kroppen!' },
-  { name: 'Fansen', quote: 'Kartongen flyr snabbare an jag fran ansvar!' },
-  { name: 'Fansen', quote: 'Alltid pa plats nar det smaller!' },
-  { name: 'Fansen', quote: 'Filansen levererar, som vanligt!' },
-  { name: 'Fansen', quote: 'Den dar kartongen visste inte vad som traffade den!' },
-  // Kjansen
-  { name: 'Kjansen', quote: 'Lugn och metodisk, sa vinner man!' },
-  { name: 'Kjansen', quote: 'Det dar var precisionsflytt!' },
-  { name: 'Kjansen', quote: 'Kansen har en plan, och den funkar!' },
-  { name: 'Kjansen', quote: 'Beraknad vinkel, perfekt retur!' },
-  { name: 'Kjansen', quote: 'Systematiskt overlagset, som alltid!' },
+  { name: 'Abud', quote: 'Den returen var rent magnifik!' },
+  { name: 'Abud', quote: 'Vilken rally, helt galen!' },
+  { name: 'Abud', quote: 'Fortare kartong, häng med!' },
+  { name: 'Abud', quote: 'Ingen stoppar Abud i zonen!' },
+  { name: 'Abud', quote: 'Den smällen var kirurgisk precision!' },
+  // Fille
+  { name: 'Fille', quote: 'Den där smällen kändes i hela kroppen!' },
+  { name: 'Fille', quote: 'Kartongen flyr snabbare än jag från ansvar!' },
+  { name: 'Fille', quote: 'Alltid på plats när det smäller!' },
+  { name: 'Fille', quote: 'Fansen levererar, som vanligt!' },
+  { name: 'Fille', quote: 'Den där kartongen visste inte vad som träffade den!' },
+  // Kjelle
+  { name: 'Kjelle', quote: 'Lugn och metodisk, så vinner man!' },
+  { name: 'Kjelle', quote: 'Det där var precisionsflytt!' },
+  { name: 'Kjelle', quote: 'Kjansen har en plan, och den funkar!' },
+  { name: 'Kjelle', quote: 'Beräknad vinkel, perfekt retur!' },
+  { name: 'Kjelle', quote: 'Systematiskt överlägset, som alltid!' },
   // Mr Finance
-  { name: 'Mr Finance', quote: 'Den returen hade hog ROI!' },
-  { name: 'Mr Finance', quote: 'Investerade i den smallen, fick bra avkastning!' },
-  { name: 'Mr Finance', quote: 'Bull market pa returer just nu!' },
+  { name: 'Mr Finance', quote: 'Den returen hade hög ROI!' },
+  { name: 'Mr Finance', quote: 'Investerade i den smällen, fick bra avkastning!' },
+  { name: 'Mr Finance', quote: 'Bull market på returer just nu!' },
   { name: 'Mr Finance', quote: 'Portfolio: 100% pong-gains!' },
-  { name: 'Mr Finance', quote: 'Den dar rallyen var en blue chip!' },
+  { name: 'Mr Finance', quote: 'Den där rallyen var en blue chip!' },
   // SebbeCeo
   { name: 'SebbeCeo', quote: 'Delegera kartongen, jag leder matchen!' },
-  { name: 'SebbeCeo', quote: 'CEO-move, den dar returen!' },
+  { name: 'SebbeCeo', quote: 'CEO-move, den där returen!' },
   { name: 'SebbeCeo', quote: 'Strategiskt beslut, taktisk retur!' },
-  { name: 'SebbeCeo', quote: 'Skalbar modell, den har rallyen!' },
-  { name: 'SebbeCeo', quote: 'Board meeting ajournerad for pong!' },
+  { name: 'SebbeCeo', quote: 'Skalbar modell, den här rallyen!' },
+  { name: 'SebbeCeo', quote: 'Board meeting ajournerad för pong!' },
   // Glammy
   { name: 'Glammy', quote: 'Den returen var lika snygg som jag!' },
-  { name: 'Glammy', quote: 'Glamorost mal, glamoros retur!' },
-  { name: 'Glammy', quote: 'Sparkle pa den dar smallen!' },
+  { name: 'Glammy', quote: 'Glamoröst mål, glamorös retur!' },
+  { name: 'Glammy', quote: 'Sparkle på den där smällen!' },
   { name: 'Glammy', quote: 'Snyggaste returen i hela turneringen!' },
   { name: 'Glammy', quote: 'Kartongen glittrar i mitt sken!' },
   // Mercan
-  { name: 'Mercan', quote: 'Den studsen var hardare an mina beats!' },
+  { name: 'Mercan', quote: 'Den studsen var hårdare än mina beats!' },
   { name: 'Mercan', quote: 'Kartongen bouncar som min musik!' },
   { name: 'Mercan', quote: 'Drop the bass, drop the kartong!' },
-  { name: 'Mercan', quote: 'Den dar returen hade bra rytm!' },
-  { name: 'Mercan', quote: 'Remix pa den rallyen, tack!' },
+  { name: 'Mercan', quote: 'Den där returen hade bra rytm!' },
+  { name: 'Mercan', quote: 'Remix på den rallyen, tack!' },
   // Brottarludwig
   { name: 'Brottarludwig', quote: 'Jag brottade ner den kartongen!' },
-  { name: 'Brottarludwig', quote: 'Suplex pa den returen!' },
-  { name: 'Brottarludwig', quote: 'Bodyslam! Kartongen ar nere!' },
+  { name: 'Brottarludwig', quote: 'Suplex på den returen!' },
+  { name: 'Brottarludwig', quote: 'Bodyslam! Kartongen är nere!' },
   { name: 'Brottarludwig', quote: 'Ingen matchar Ludwig i ringen!' },
   { name: 'Brottarludwig', quote: 'Armbrytning med kartongen, och jag vann!' },
   // Stajna
-  { name: 'Stajna', quote: 'Stansen ar starkare an nagonsin!' },
+  { name: 'Stajna', quote: 'Stansen är starkare än någonsin!' },
   { name: 'Stajna', quote: 'Ingen stannar Stajna!' },
   { name: 'Stajna', quote: 'Stajna-style, accept no substitute!' },
-  { name: 'Stajna', quote: 'Den dar returen hade stansen signatur!' },
-  { name: 'Stajna', quote: 'Sten, stal, Stajna!' },
+  { name: 'Stajna', quote: 'Den där returen hade Stajnas signatur!' },
+  { name: 'Stajna', quote: 'Sten, stål, Stajna!' },
 ];
 
 let player, ai, ball;
@@ -395,7 +395,7 @@ let floatingItems = [];
 let screenShake = { x: 0, y: 0, intensity: 0 };
 let lastHitSide = null;
 
-// Floating background items (pask-tema)
+// Floating background items (påsk-tema)
 const FLOAT_EMOJIS = ['🥚', '🐣', '🐔', '🌷', '🐰', '🌸', '🪺', '🐥', '🌼', '📦'];
 
 function initFloatingItems() {
@@ -586,8 +586,12 @@ function sfxGameOver(won) {
 
 // Input
 let keys = {};
+let lastQuoteIndex = -1;
 
-document.addEventListener('keydown', e => { keys[e.key] = true; });
+document.addEventListener('keydown', e => {
+  keys[e.key] = true;
+  if (e.key === 'Enter' && !gameRunning) startGame();
+});
 document.addEventListener('keyup', e => { keys[e.key] = false; });
 
 
@@ -659,9 +663,12 @@ function update() {
     if (rallyCount >= 3) {
       comboText = rallyCount >= 5 ? 'Rally x' + rallyCount + '!' : 'Bra retur!';
       comboTimer = rallyCount >= 5 ? 120 : 90;
-      const q = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+      let qi = Math.floor(Math.random() * QUOTES.length);
+      if (qi === lastQuoteIndex) qi = (qi + 1 + Math.floor(Math.random() * (QUOTES.length - 1))) % QUOTES.length;
+      lastQuoteIndex = qi;
+      const q = QUOTES[qi];
       quoteText = '"' + q.quote + '"';
-      quoteName = '- ' + q.name;
+      quoteName = '– ' + q.name;
     }
   }
 
@@ -965,13 +972,13 @@ function updateScoreUI() {
 
 const WIN_LINES = [
   'Flyttgubbarna bar hem segern! 📦💪',
-  'Alla kartonger pa plats. Glad pask!',
+  'Alla kartonger på plats. Glad påsk!',
   'Gubbarna lyfte tungt idag! 🏋️',
 ];
 const LOSE_LINES = [
   'Kycklingarna hackade sig till vinst! 🐣',
   'Pip pip, kycklingarna tog hem det!',
-  'Fjaderfana var for snabba idag! 🐔',
+  'Fjäderfäna var för snabba idag! 🐔',
 ];
 
 function endGame() {
