@@ -506,10 +506,9 @@ function spawnScoreExplosion(x, y, color) {
   }
 }
 
-// --- CHIPTUNE AUDIO ---
+// --- AUDIO ---
 let audioCtx = null;
-let musicPlaying = false;
-let musicTimeout = null;
+let musicAudio = null;
 
 function initAudio() {
   if (audioCtx) return;
@@ -530,162 +529,21 @@ function playNote(freq, duration, time, vol = 0.08, type = 'square') {
   osc.stop(time + duration);
 }
 
-// Demoscene-style arpeggio helper
-function playArp(baseFreq, time, vol, speed) {
-  if (!audioCtx) return;
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  osc.type = 'square';
-  // Rapid arpeggio: root -> major third -> fifth -> octave
-  const freqs = [baseFreq, baseFreq * 1.25, baseFreq * 1.5, baseFreq * 2];
-  const stepDur = speed || 0.04;
-  osc.frequency.setValueAtTime(freqs[0], time);
-  osc.frequency.setValueAtTime(freqs[1], time + stepDur);
-  osc.frequency.setValueAtTime(freqs[2], time + stepDur * 2);
-  osc.frequency.setValueAtTime(freqs[3], time + stepDur * 3);
-  osc.frequency.setValueAtTime(freqs[0], time + stepDur * 4);
-  osc.frequency.setValueAtTime(freqs[1], time + stepDur * 5);
-  gain.gain.setValueAtTime(vol, time);
-  gain.gain.exponentialRampToValueAtTime(0.001, time + stepDur * 6);
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  osc.start(time);
-  osc.stop(time + stepDur * 6);
-}
-
-// Demoscene-style vibrato lead
-function playVibratoNote(freq, duration, time, vol) {
-  if (!audioCtx) return;
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  const lfo = audioCtx.createOscillator();
-  const lfoGain = audioCtx.createGain();
-  osc.type = 'sawtooth';
-  osc.frequency.value = freq;
-  lfo.type = 'sine';
-  lfo.frequency.value = 6; // vibrato rate
-  lfoGain.gain.value = freq * 0.015; // vibrato depth
-  lfo.connect(lfoGain);
-  lfoGain.connect(osc.frequency);
-  gain.gain.setValueAtTime(0, time);
-  gain.gain.linearRampToValueAtTime(vol, time + 0.02);
-  gain.gain.setValueAtTime(vol * 0.8, time + duration * 0.5);
-  gain.gain.exponentialRampToValueAtTime(0.001, time + duration * 0.95);
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-  osc.start(time);
-  osc.stop(time + duration);
-  lfo.start(time);
-  lfo.stop(time + duration);
-}
-
-// --- DEMOSCENE TRACKER ---
-// BPM ~150, 16th notes
-const BPM = 150;
-const ROW_TIME = 60 / BPM / 4; // 16th note = 0.1s
-
-// Pattern data: each row is one 16th note
-// Lead melody (sawtooth + vibrato) - catchy demoscene hook
-const LEAD = [
-  // A section - driving melody (16 rows = 1 bar)
-  659,0,784,0, 880,0,1047,880, 784,0,659,0, 784,880,784,0,
-  // A section repeat with variation
-  659,0,784,0, 880,0,1047,1175, 1047,0,880,0, 784,659,784,0,
-  // B section - higher energy
-  1047,0,1175,0, 1319,0,1175,1047, 880,0,1047,0, 1175,1319,1175,0,
-  // B section resolve
-  1047,0,880,0, 784,0,880,1047, 880,0,784,0, 659,784,659,0,
-];
-
-// Arp channel - fast arpeggios on chord roots
-const ARP_ROOTS = [
-  // Bar 1-2: C major -> G major
-  262,262,262,262, 262,262,262,262, 196,196,196,196, 196,196,196,196,
-  262,262,262,262, 262,262,262,262, 220,220,220,220, 220,220,220,220,
-  // Bar 3-4: Am -> F -> G -> C
-  220,220,220,220, 175,175,175,175, 196,196,196,196, 196,196,196,196,
-  262,262,262,262, 175,175,175,175, 196,196,196,196, 262,262,262,262,
-];
-
-// Bass (triangle) - pumping demoscene bassline
-const BASS_PAT = [
-  131,0,131,131, 0,131,0,131, 98,0,98,98, 0,98,0,98,
-  131,0,131,131, 0,131,0,131, 110,0,110,110, 0,110,0,110,
-  110,0,110,110, 87,0,87,87, 98,0,98,98, 0,98,0,98,
-  131,0,131,131, 87,0,87,87, 98,0,98,98, 131,0,131,0,
-];
-
-function playMusic() {
-  if (!audioCtx || !musicPlaying) return;
-  const now = audioCtx.currentTime;
-  const rows = LEAD.length;
-
-  for (let i = 0; i < rows; i++) {
-    const t = now + i * ROW_TIME;
-
-    // Lead melody
-    if (LEAD[i] > 0) {
-      playVibratoNote(LEAD[i], ROW_TIME * 1.8, t, 0.045);
-    }
-
-    // Arpeggios (every 2 rows for breathing room)
-    if (i % 2 === 0 && ARP_ROOTS[i] > 0) {
-      playArp(ARP_ROOTS[i] * 2, t, 0.025, 0.035);
-    }
-
-    // Bass
-    if (BASS_PAT[i] > 0) {
-      playNote(BASS_PAT[i], ROW_TIME * 0.8, t, 0.06, 'triangle');
-    }
-
-    // Drums
-    if (i % 4 === 0) {
-      // Kick
-      const kickOsc = audioCtx.createOscillator();
-      const kickGain = audioCtx.createGain();
-      kickOsc.type = 'sine';
-      kickOsc.frequency.setValueAtTime(150, t);
-      kickOsc.frequency.exponentialRampToValueAtTime(40, t + 0.1);
-      kickGain.gain.setValueAtTime(0.12, t);
-      kickGain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-      kickOsc.connect(kickGain);
-      kickGain.connect(audioCtx.destination);
-      kickOsc.start(t);
-      kickOsc.stop(t + 0.15);
-    }
-    if (i % 4 === 2) {
-      // Snare (noise-like)
-      playNote(180, 0.06, t, 0.04, 'square');
-      playNote(330, 0.04, t, 0.03, 'sawtooth');
-    }
-    if (i % 2 === 1) {
-      // Hihat
-      playNote(1200, 0.015, t, 0.015, 'sawtooth');
-    }
-    // Open hihat on offbeats
-    if (i % 8 === 3 || i % 8 === 7) {
-      playNote(900, 0.04, t, 0.02, 'sawtooth');
-    }
-  }
-
-  // Loop
-  const loopMs = rows * ROW_TIME * 1000;
-  musicTimeout = setTimeout(() => {
-    if (musicPlaying) playMusic();
-  }, loopMs - 80);
-}
-
 function startMusic() {
   initAudio();
-  musicPlaying = true;
-  playMusic();
+  if (!musicAudio) {
+    musicAudio = new Audio('music.ogg');
+    musicAudio.loop = true;
+    musicAudio.volume = 0.5;
+  }
+  musicAudio.currentTime = 0;
+  musicAudio.play().catch(() => {});
 }
 
 function stopMusic() {
-  musicPlaying = false;
-  if (musicTimeout) {
-    clearTimeout(musicTimeout);
-    musicTimeout = null;
+  if (musicAudio) {
+    musicAudio.pause();
+    musicAudio.currentTime = 0;
   }
 }
 
